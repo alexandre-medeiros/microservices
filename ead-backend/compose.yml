@@ -1,0 +1,42 @@
+﻿version: "3.9"
+
+services:
+  ead-authuser:
+    image: postgres:16.0-alpine3.18
+    container_name: ead-authuser
+    environment:
+      POSTGRES_DB: ead-authuser
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    ports:
+      - "5433:5432"
+    networks:
+      - ead-network
+
+  ead-notification:
+    image: postgres:16.0-alpine3.18
+    container_name: ead-notification
+    environment:
+      POSTGRES_DB: ead-notification
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    ports:
+      - "5434:5432"
+    networks:
+      - ead-network
+
+  ead-course:
+    image: postgres:16.0-alpine3.18
+    container_name: ead-course
+    environment:
+      POSTGRES_DB: ead-course
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    ports:
+      - "5435:5432"
+    networks:
+      - ead-network
+
+networks:
+  ead-network:
+    driver: bridge

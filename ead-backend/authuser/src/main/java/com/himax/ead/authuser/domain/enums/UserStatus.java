@@ -1,0 +1,6 @@
+package com.himax.ead.authuser.domain.enums;
+
+public enum UserStatus {
+    ACTIVE,
+    BLOCKED;
+}

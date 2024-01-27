@@ -1,0 +1,38 @@
+
+k	java:S117z"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¶øû¥şÿÿÿÿ
+l	java:S117²"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(³ì“ùÿÿÿÿ
+l	java:S117û"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(×¾Ú÷ùÿÿÿÿ
+y
+java:S1488	"^Immediately return this expression instead of assigning it to the temporary variable "ranNum".(ç¨Ùüÿÿÿÿ
+]
+java:S2184"BCast one of the operands of this division operation to a "double".(Ì é³ıÿÿÿÿ
+D
+java:S2140	")Use "java.util.Random.nextInt()" instead.(ç¨Ùüÿÿÿÿ
+A
+java:S2185"&Remove this silly call to "Math.floor"(Ì é³ıÿÿÿÿ
+Q	java:S125?"<This block of commented-out lines of code should be removed.(¼×Ûú
+Q	java:S125@"<This block of commented-out lines of code should be removed.(½¢è†
+Q	java:S125A"<This block of commented-out lines of code should be removed.(Æòïë
+Q	java:S125B"<This block of commented-out lines of code should be removed.(êÎ¾¡
+E
+java:S1481]"/Remove this unused "nDigResult" local variable.(¶éˆ
+4
+java:S2119`"Save and re-use this "Random".(Í“Šö
+?
+java:S1659‚"#Declare "dig11" on a separate line.(îùıøÿÿÿÿ
+U
+java:S1659ƒ">Declare "i" and all following declarations on a separate line.(¸„áë
+B
+java:S1905"&Remove this unnecessary cast to "int".(ÚËÍ¶ıÿÿÿÿ
+B
+java:S1905"&Remove this unnecessary cast to "int".(ÚËÍ¶ıÿÿÿÿ
+n
+java:S3776²"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(³ì“ùÿÿÿÿ
+:
+java:S1659º"#Declare "dig14" on a separate line.(Æî®ş
+U
+java:S1659»">Declare "i" and all following declarations on a separate line.(¸„áë
+B
+java:S1905Æ"&Remove this unnecessary cast to "int".(ì¤¤»ûÿÿÿÿ
+B
+java:S1905×"&Remove this unnecessary cast to "int".(ì¤¤»ûÿÿÿÿ

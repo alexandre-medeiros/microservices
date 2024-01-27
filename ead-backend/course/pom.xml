@@ -9,16 +9,16 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.himax.ead</groupId>
-	<artifactId>authuser</artifactId>
+	<artifactId>course</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>authuser</name>
-	<description>Himax users authenticator and authorization EAD service </description>
+	<name>course</name>
+	<description>Himax course EAD service </description>
 	<properties>
 		<java.version>11</java.version>
 		<dockerfile-maven-version>1.4.13</dockerfile-maven-version>
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.28</org.projectlombok.version>
-	</properties>		
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -54,7 +54,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
