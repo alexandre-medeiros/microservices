@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.IgnoredPropertyException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
  * following RFC 9457 - Problem Details for HTTP APIs.
  * @see <a href="https://www.rfc-editor.org/info/rfc9457">RFC 9457</a>
  */
+@Log4j2
 @Service
 public class ErrorHandler {
 
@@ -31,7 +33,9 @@ public class ErrorHandler {
     public static final String INVALID_BODY = "Invalid body";
 
     public ProblemDetail handleException(Exception ex, HttpStatus status, HttpServletRequest servletRequest, MessageSource messageSource) {
-        return setupProblemDetail(ex, status, servletRequest,messageSource);
+       ProblemDetail problemDetail = setupProblemDetail(ex, status, servletRequest,messageSource);
+       log.debug("Exception {} problem detail {} trace {}",getErrorName(ex), problemDetail.toString(), ex.toString());
+       return problemDetail;
     }
 
     private ProblemDetail setupProblemDetail(Exception ex, HttpStatus status,HttpServletRequest servletRequest, MessageSource messageSource) {

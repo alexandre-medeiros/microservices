@@ -13,9 +13,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        show_sql:true
+    show-sql: true
+
   jackson:
     deserialization:
       fail-on-unknown-properties: true

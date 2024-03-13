@@ -1,27 +1,23 @@
 package com.himax.ead.authuser.api.v1.model.auth;
 
 import com.himax.ead.authuser.core.validation.cpf.CPF;
+import com.himax.ead.authuser.core.validation.nullsizeable.NullSizeable;
 import lombok.Data;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 @Data
 public class RegistrationInputDto {
-    @NotBlank
-    @Size(max = 50)
+    @NullSizeable(min=4, max = 50)
     private String username;
 
-    @NotBlank
     @Email
-    @Size(max = 50)
+    @NullSizeable(min=6, max = 50)
     private String email;
 
-    @NotBlank
-    @Size(min=6, max = 20)
+    @NullSizeable(min=6, max = 20)
     private String password;
 
-    @NotBlank
-    @Size(max = 150)
+    @NullSizeable(min=6, max = 250)
     private String fullName;
 
     @Size(max = 20)
@@ -29,4 +25,15 @@ public class RegistrationInputDto {
 
     @CPF
     private String cpf;
+
+    @Override
+    public String toString() {
+        return "RegistrationInputDto{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", cpf='" + cpf + '\'' +
+                '}';
+    }
 }

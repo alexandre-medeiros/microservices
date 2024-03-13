@@ -6,17 +6,18 @@ import com.himax.ead.authuser.domain.exception.AlreadyExistsException;
 import com.himax.ead.authuser.domain.exception.EntityNotFoundException;
 import com.himax.ead.authuser.domain.model.Users;
 import com.himax.ead.authuser.domain.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
+@Log4j2
+@AllArgsConstructor
 @Service
 public class UserRegistryService {
-
-    @Autowired
     private UserRepository repository;
 
     public Page<Users> findAll(Pageable pageable) {
@@ -42,6 +43,7 @@ public class UserRegistryService {
                 .isPresent();
 
         if(existsSameUserName){
+            log.warn("Already exist another user with same user name {}}", user.getUsername());
             throw new AlreadyExistsException(String.format("Already exist another user with same user name %s", user.getUsername()));
         }
 
@@ -51,6 +53,7 @@ public class UserRegistryService {
                 .isPresent();
 
         if(existsSameEmail){
+            log.warn("Already exist another user with same email {}", user.getEmail());
             throw new AlreadyExistsException(String.format("Already exist another user with same email %s", user.getEmail()));
         }
 
