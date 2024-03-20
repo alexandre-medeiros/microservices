@@ -1,5 +1,8 @@
 package com.himax.ead.course.domain.service;
 
+import com.himax.ead.course.api.v1.model.CourseFilter;
+import com.himax.ead.course.domain.enums.CourseLevel;
+import com.himax.ead.course.domain.enums.CourseStatus;
 import com.himax.ead.course.domain.model.Course;
 import com.himax.ead.course.domain.repository.CourseRepository;
 import com.himax.ead.course.domain.repository.LessonRepository;
@@ -33,7 +36,10 @@ public class CourseService {
         return courseRepository.findById(courseId);
     }
 
-    public Page<Course> findAll(Pageable pageable) {
-        return courseRepository.findAll(pageable);
+    public Page<Course> findAllWithFilter(CourseFilter filter, UUID userId, Pageable pageable) {
+        CourseLevel courseLevel = filter.getCourseLevel();
+        CourseStatus courseStatus = filter.getCourseStatus();
+        String name = filter.getName();
+        return courseRepository.findAllWithFilter(courseLevel, courseStatus, name, userId, pageable);
     }
 }

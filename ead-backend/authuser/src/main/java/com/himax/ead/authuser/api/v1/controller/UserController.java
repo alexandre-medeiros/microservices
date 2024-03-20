@@ -3,6 +3,7 @@ package com.himax.ead.authuser.api.v1.controller;
 import com.himax.ead.authuser.api.v1.mapper.UserMapper;
 import com.himax.ead.authuser.api.v1.model.auth.PasswordInputDto;
 import com.himax.ead.authuser.api.v1.model.user.ImageInputDto;
+import com.himax.ead.authuser.api.v1.model.user.UserFilter;
 import com.himax.ead.authuser.api.v1.model.user.UserInputDto;
 import com.himax.ead.authuser.api.v1.model.user.UserOutputDto;
 import com.himax.ead.authuser.domain.model.Users;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
@@ -38,10 +40,12 @@ public class UserController {
     private UserMapper mapper;
 
     @GetMapping
-    public Page<UserOutputDto> findAll(@PageableDefault(page = 0, size = 10, sort = "username", direction = Sort.Direction.ASC)
-            Pageable pageable){
+    public Page<UserOutputDto> findAll(
+            @Valid UserFilter filter,
+            @PageableDefault(page = 0, size = 10, sort = "username", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) String courseId){
         log.debug("GET findAll users");
-        Page<Users> all = service.findAll(pageable);
+        Page<Users> all = service.findAllWithFilter(filter, courseId, pageable);
         List<UserOutputDto> userOutputDtos = mapper.toListDto(all);
         log.debug("GET findAll returned all users");
         log.info("All users returned successfully");

@@ -1,3 +1,4 @@
+delete from courses_users;
 delete from tb_lessons;
 delete from tb_modules;
 delete from tb_courses;
@@ -81,3 +82,8 @@ INSERT INTO tb_lessons (id, creation_date, description, title, video_url, module
 VALUES ('f60a230e-7833-41d0-85e9-b4aa78a6b777', '2023-03-02 10:45:00', 'CRUD Operations in MongoDB', 'Lesson 2', 'mongodb_lesson2.mp4', 'f60a230e-7833-41d0-85e9-b4aa78a6b761');
 INSERT INTO tb_lessons (id, creation_date, description, title, video_url, module_id)
 VALUES ('f60a230e-7833-41d0-85e9-b4aa78a6b778', '2023-03-03 12:00:00', 'Indexing and Aggregation in MongoDB', 'Lesson 3', 'mongodb_lesson3.mp4', 'f60a230e-7833-41d0-85e9-b4aa78a6b762');
+
+INSERT INTO courses_users (id, user_id, course_id)
+VALUES
+    ('123e4567-e89b-12d3-a456-426614177896', '123e4567-e89b-12d3-a456-426614174001', 'f60a230e-7833-41d0-85e9-b4aa78a6b745'),
+    ('123e4567-e89b-12d3-a456-426614177888', '123e4567-e89b-12d3-a456-426614174001', 'f60a230e-7833-41d0-85e9-b4aa78a6b743');

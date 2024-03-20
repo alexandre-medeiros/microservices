@@ -1,5 +1,6 @@
 package com.himax.ead.authuser.domain.services;
 
+import com.himax.ead.authuser.api.v1.model.user.UserFilter;
 import com.himax.ead.authuser.domain.enums.UserStatus;
 import com.himax.ead.authuser.domain.enums.UserType;
 import com.himax.ead.authuser.domain.exception.AlreadyExistsException;
@@ -20,8 +21,12 @@ import java.util.UUID;
 public class UserRegistryService {
     private UserRepository repository;
 
-    public Page<Users> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<Users> findAllWithFilter(UserFilter filter, String courseId, Pageable pageable) {
+        UserStatus userStatus = filter.getUserStatus();
+        UserType userType = filter.getUserType();
+        String email = filter.getEmail();
+        String fullName = filter.getFullName();
+        return repository.findAllWithFilter(courseId,userStatus,userType,email,fullName,pageable);
     }
 
     public Users find(UUID id) {

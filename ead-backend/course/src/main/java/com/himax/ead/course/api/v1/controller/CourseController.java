@@ -3,6 +3,7 @@ package com.himax.ead.course.api.v1.controller;
 import com.himax.ead.course.api.GetMessages;
 import com.himax.ead.course.api.v1.mapper.course.CourseMapper;
 import com.himax.ead.course.api.v1.model.CourseDto;
+import com.himax.ead.course.api.v1.model.CourseFilter;
 import com.himax.ead.course.domain.exception.EntityNotFoundException;
 import com.himax.ead.course.domain.model.Course;
 import com.himax.ead.course.domain.service.CourseService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
@@ -80,8 +82,11 @@ public class CourseController {
     }
 
     @GetMapping
-    public Page<CourseDto> getAllCourses(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
-        List<CourseDto> list = mapper.toDtoList(courseService.findAll(pageable).toList());
+    public Page<CourseDto> getAllCourses(
+            @Valid CourseFilter filter,
+            @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) UUID userId){
+        List<CourseDto> list = mapper.toDtoList(courseService.findAllWithFilter(filter, userId, pageable).toList());
         return new PageImpl<>(list,pageable, list.size());
     }
 
