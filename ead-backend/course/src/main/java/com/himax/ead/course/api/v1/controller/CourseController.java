@@ -1,20 +1,24 @@
 package com.himax.ead.course.api.v1.controller;
 
-import com.himax.ead.course.api.GetMessages;
+import com.himax.ead.course.api.exceptionhandler.ErrorHandler;
+import com.himax.ead.course.api.exceptionhandler.ProblemDetail;
 import com.himax.ead.course.api.v1.mapper.course.CourseMapper;
 import com.himax.ead.course.api.v1.model.CourseDto;
 import com.himax.ead.course.api.v1.model.CourseFilter;
-import com.himax.ead.course.domain.exception.EntityNotFoundException;
+import com.himax.ead.course.core.validators.CourseValidator;
 import com.himax.ead.course.domain.model.Course;
 import com.himax.ead.course.domain.service.CourseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +32,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Log4j2
@@ -37,42 +40,43 @@ import java.util.UUID;
 @RequestMapping("/courses")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class CourseController {
+
     private CourseService courseService;
     private CourseMapper mapper;
+    private CourseValidator validator;
+    private ErrorHandler errorHandler;
+    private MessageSource messageSource;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CourseDto saveCourse(@RequestBody @Valid CourseDto dto){
+    public ResponseEntity<Object> saveCourse(@RequestBody CourseDto dto, Errors errors) {
         log.debug("POST saveCourse courseDto received {} ", dto.toString());
+        validator.validate(dto, errors);
+
+        if (errors.hasErrors()) {
+            ProblemDetail problemDetail = errorHandler.handleErrors(messageSource, errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+        }
+
         Course course = mapper.toDomain(dto);
         Course saved = courseService.save(course);
         log.debug("POST saveCourse courseId saved {} ", saved.getId());
         log.info("Course saved successfully courseId {} ", saved.getId());
-        return mapper.toDto(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(saved));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCourse(@PathVariable UUID id){
+    public void deleteCourse(@PathVariable UUID id) {
         log.debug("DELETE deleteCourse courseId received {} ", id);
-        Optional<Course> courseModelOptional = courseService.findById(id);
-        if(courseModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getCourseNotExist( id));
-        }
-        courseService.delete(courseModelOptional.get());
+        courseService.delete(courseService.findById(id));
         log.debug("DELETE deleteCourse courseId deleted {} ", id);
         log.info("Course deleted successfully courseId {} ", id);
     }
 
     @PutMapping("/{id}")
-    public CourseDto updateCourse(@PathVariable UUID id, @RequestBody @Valid CourseDto courseDto){
+    public CourseDto updateCourse(@PathVariable UUID id, @RequestBody @Valid CourseDto courseDto) {
         log.debug("PUT updateCourse courseDto received {} ", courseDto.toString());
-        Optional<Course> courseModelOptional = courseService.findById(id);
-        if(courseModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getCourseNotExist( id));
-        }
-
-        Course existing = courseModelOptional.get();
+        Course existing = courseService.findById(id);
         Course updated = mapper.toDomain(courseDto);
 
         Course courseModel = courseService.save(mapper.update(updated, existing));
@@ -85,16 +89,14 @@ public class CourseController {
     public Page<CourseDto> getAllCourses(
             @Valid CourseFilter filter,
             @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-            @RequestParam(required = false) UUID userId){
+            @RequestParam(required = false) UUID userId) {
         List<CourseDto> list = mapper.toDtoList(courseService.findAllWithFilter(filter, userId, pageable).toList());
-        return new PageImpl<>(list,pageable, list.size());
+        return new PageImpl<>(list, pageable, list.size());
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CourseDto getOneCourse(@PathVariable UUID id){
-        Optional<Course> courseModelOptional = courseService.findById(id);
-        return courseModelOptional.map(course -> mapper.toDto(course))
-                .orElseThrow(()->new EntityNotFoundException(GetMessages.getCourseNotExist( id)));
+    public CourseDto getOneCourse(@PathVariable UUID id) {
+        return mapper.toDto(courseService.findById(id));
     }
 }

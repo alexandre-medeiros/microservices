@@ -1,12 +1,13 @@
 package com.himax.ead.course.domain.service;
 
+import com.himax.ead.course.api.exceptionhandler.GetMessages;
+import com.himax.ead.course.domain.exception.EntityNotFoundException;
 import com.himax.ead.course.domain.model.Lesson;
 import com.himax.ead.course.domain.repository.LessonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -21,8 +22,9 @@ public class LessonService {
         return lessonRepository.save(lessonModel);
     }
 
-    public Optional<Lesson> findLessonIntoModule(UUID moduleId, UUID lessonId) {
-        return lessonRepository.findLessonIntoModule(moduleId, lessonId);
+    public Lesson findLessonIntoModule(UUID moduleId, UUID lessonId) {
+        return lessonRepository.findLessonIntoModule(moduleId, lessonId)
+                .orElseThrow(()-> new EntityNotFoundException(GetMessages.getLessonNotExist(lessonId)));
     }
 
     @Transactional

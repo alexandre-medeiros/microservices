@@ -92,7 +92,7 @@ public class UserController {
         log.info("Image for user {} updated successfully",id);
     }
 
-    @DeleteMapping("id")
+    @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remove (@PathVariable UUID id){
         log.debug("DELETE remove user received with id {}",id);

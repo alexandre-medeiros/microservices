@@ -1,11 +1,8 @@
 package com.himax.ead.course.api.v1.controller;
 
 
-import com.himax.ead.course.api.GetMessages;
 import com.himax.ead.course.api.v1.mapper.modules.ModuleMapper;
 import com.himax.ead.course.api.v1.model.ModuleDto;
-import com.himax.ead.course.domain.exception.EntityNotFoundException;
-import com.himax.ead.course.domain.model.Course;
 import com.himax.ead.course.domain.model.Modules;
 import com.himax.ead.course.domain.service.CourseService;
 import com.himax.ead.course.domain.service.ModuleService;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Log4j2
@@ -45,13 +41,8 @@ public class ModuleController {
     public ModuleDto saveModule(@PathVariable UUID courseId,
                                 @RequestBody @Valid ModuleDto moduleDto){
         log.debug("POST saveModule moduleDto received {} ", moduleDto.toString());
-        Optional<Course> courseModelOptional = courseService.findById(courseId);
-        if(courseModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getCourseNotExist(courseId));
-        }
-
         Modules module = mapper.toDomain(moduleDto);
-        module.setCourse(courseModelOptional.get());
+        module.setCourse(courseService.findById(courseId));
         Modules moduleModel = moduleService.save(module);
         log.debug("POST saveModule moduleId saved {} ", moduleModel.getId());
         log.info("Module saved successfully moduleId {} ", moduleModel.getId());
@@ -63,16 +54,9 @@ public class ModuleController {
     public void deleteModule(@PathVariable UUID courseId,
                              @PathVariable UUID moduleId){
         log.debug("DELETE deleteModule moduleId received {} ", moduleId);
-        Optional<Course> courseModelOptional = courseService.findById(courseId);
-        if(courseModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getCourseNotExist( courseId));
-        }
-
-        Optional<Modules> moduleModelOptional = moduleService.findById(moduleId);
-        if(moduleModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getModuleNotExist(moduleId));
-        }
-        moduleService.delete(moduleModelOptional.get());
+        courseService.findById(courseId);
+        Modules module = moduleService.findById(moduleId);
+        moduleService.delete(module);
         log.debug("DELETE deleteModule moduleId deleted {} ", moduleId);
         log.info("Module deleted successfully moduleId {} ", moduleId);
     }
@@ -82,17 +66,9 @@ public class ModuleController {
                                   @PathVariable(value="moduleId") UUID moduleId,
                                   @RequestBody @Valid ModuleDto moduleDto){
         log.debug("PUT updateModule moduleDto received {} ", moduleDto.toString());
-        Optional<Course> courseModelOptional = courseService.findById(courseId);
-        if(courseModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getCourseNotExist( courseId));
-        }
-
-        Optional<Modules> moduleModelOptional = moduleService.findById(moduleId);
-        if(moduleModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getModuleNotExist(moduleId));
-        }
-
-        Modules existing = moduleModelOptional.get();
+        courseService.findById(courseId);
+        moduleService.findById(moduleId);
+        Modules existing = moduleService.findById(moduleId);
         Modules updated = mapper.toDomain(moduleDto);
         Modules moduleModel =  moduleService.save(mapper.update(updated,existing));
 
@@ -103,26 +79,15 @@ public class ModuleController {
 
     @GetMapping("/courses/{courseId}/modules")
     public List<ModuleDto> getAllModules(@PathVariable(value="courseId") UUID courseId){
-        Optional<Course> courseModelOptional = courseService.findById(courseId);
-        if(courseModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getCourseNotExist( courseId));
-        }
-
+        courseService.findById(courseId);
         return mapper.toDtoList(moduleService.findAllByCourse(courseId));
     }
 
     @GetMapping("/courses/{courseId}/modules/{moduleId}")
     public ModuleDto getOneModule(@PathVariable(value="courseId") UUID courseId,
                                   @PathVariable(value="moduleId") UUID moduleId){
-        Optional<Course> courseModelOptional = courseService.findById(courseId);
-        if(courseModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getCourseNotExist( courseId));
-        }
-
-        Optional<Modules> moduleModelOptional = moduleService.findById(moduleId);
-        if(moduleModelOptional.isEmpty()){
-            throw new EntityNotFoundException(GetMessages.getModuleNotExist(moduleId));
-        }
-        return mapper.toDto(moduleModelOptional.get());
+        courseService.findById(courseId);
+        Modules module = moduleService.findById(moduleId);
+        return mapper.toDto(module);
     }
 }

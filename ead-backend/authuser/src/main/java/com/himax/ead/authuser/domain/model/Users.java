@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,12 +33,12 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "users")
-public class Users implements Serializable{
+public class Users implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
     private UUID id;
     @Column(nullable = false, unique = true, length = 50)
     private String username;
@@ -65,23 +67,24 @@ public class Users implements Serializable{
     @Column(nullable = false)
     private OffsetDateTime lastUpdateDate;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<UserCourse> usersCourses;
 
-    public void verifyCurrentAndNewPassword(String entered, String newPassword){
+    public void verifyCurrentAndNewPassword(String entered, String newPassword) {
         passwordEnteredIsTheSameAsRegistered(entered);
         newPasswordIsEqualsAsRegistered(newPassword);
     }
 
-    private void passwordEnteredIsTheSameAsRegistered(String entered){
-        if(!this.password.equals(entered)){
-            log.warn("Current password entered to user id {} is different of the registered",this.id);
+    private void passwordEnteredIsTheSameAsRegistered(String entered) {
+        if (!this.password.equals(entered)) {
+            log.warn("Current password entered to user id {} is different of the registered", this.id);
             throw new BusinessException("Current password entered is different of the registered");
         }
     }
 
-    private void newPasswordIsEqualsAsRegistered(String newPassword){
-        if(this.password.equals(newPassword)){
-            log.warn("New password entered to user id {} is equals as registered",this.id);
+    private void newPasswordIsEqualsAsRegistered(String newPassword) {
+        if (this.password.equals(newPassword)) {
+            log.warn("New password entered to user id {} is equals as registered", this.id);
             throw new BusinessException("New password entered is equals as registered");
         }
     }

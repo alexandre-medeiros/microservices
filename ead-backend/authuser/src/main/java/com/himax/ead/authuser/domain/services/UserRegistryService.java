@@ -4,6 +4,7 @@ import com.himax.ead.authuser.api.v1.model.user.UserFilter;
 import com.himax.ead.authuser.domain.enums.UserStatus;
 import com.himax.ead.authuser.domain.enums.UserType;
 import com.himax.ead.authuser.domain.exception.AlreadyExistsException;
+import com.himax.ead.authuser.domain.exception.EntityInUseException;
 import com.himax.ead.authuser.domain.exception.EntityNotFoundException;
 import com.himax.ead.authuser.domain.model.Users;
 import com.himax.ead.authuser.domain.repository.UserRepository;
@@ -37,7 +38,11 @@ public class UserRegistryService {
 
     public void remove(UUID id) {
         find(id);
-        repository.deleteById(id);
+        try{
+            repository.deleteById(id);
+        }catch (Exception ex){
+            throw new EntityInUseException(String.format("User with id %s can not be deleted because is in use", id));
+        }
     }
 
     @Transactional
@@ -67,8 +72,21 @@ public class UserRegistryService {
         return repository.save(user);
     }
 
+    public Users findbyUserName(String userName){
+        return repository.findByUsername(userName)
+                .orElseThrow(()->
+                        new EntityNotFoundException(String.format("User with userName %s do not exist", userName)));
+    }
+
     @Transactional
     public Users update(Users user) {
         return create(user);
+    }
+
+    @Transactional
+    public Users saveInstructor(UUID userId) {
+        Users user = find(userId);
+        user.setUserType(UserType.INSTRUCTOR);
+        return repository.save(user);
     }
 }

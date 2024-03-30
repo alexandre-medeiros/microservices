@@ -28,6 +28,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "TB_COURSES")
 public class Course implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -59,5 +60,10 @@ public class Course implements Serializable {
     private List<Modules> modules;
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<CourseUser> coursesUsers;
+
+    public CourseUser convertToCourseUser(UUID userId) {
+        return new CourseUser(null, userId, this);
+    }
 }

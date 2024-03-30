@@ -1,5 +1,7 @@
 package com.himax.ead.course.domain.service;
 
+import com.himax.ead.course.api.exceptionhandler.GetMessages;
+import com.himax.ead.course.domain.exception.EntityNotFoundException;
 import com.himax.ead.course.domain.model.Modules;
 import com.himax.ead.course.domain.repository.LessonRepository;
 import com.himax.ead.course.domain.repository.ModuleRepository;
@@ -39,8 +41,9 @@ public class ModuleService {
         return moduleRepository.findAllLModulesIntoCourse(courseId);
     }
 
-    public Optional<Modules> findById(UUID moduleId) {
-        return moduleRepository.findById(moduleId);
+    public Modules findById(UUID moduleId) {
+        return moduleRepository.findById(moduleId)
+                .orElseThrow(()-> new EntityNotFoundException(GetMessages.getModuleNotExist(moduleId)));
     }
 
     public Page<Modules> findAllByCourse(Pageable pageable) {

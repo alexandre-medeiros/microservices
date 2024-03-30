@@ -10,24 +10,33 @@ spring:
   sql:
     init:
       mode: always
+
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        show_sql:true
-  jackson:
-    deserialization:
-      fail-on-unknown-properties: true
-      fail-on-ignored-properties: true
-  mvc:
-    throw-exception-if-no-handler-found: true
-  web:
-    resources.add-mappings: false
+        show_sql: true
+        format_sql: true
   output:
     ansi:
       enabled: ALWAYS
+# Used if you want to control the exact format of response no more fields no less fields
+#  jackson:
+#    deserialization:
+#      fail-on-unknown-properties: true
+#      fail-on-ignored-properties: true
+#  mvc:
+#    throw-exception-if-no-handler-found: true
+#  web:
+#    resources.add-mappings: false
 
-logging:
-  level:
-    com.himax.ead: DEBUG
+#logging:
+#  level:
+#    com.himax.ead: DEBUG
+
+ead:
+  api:
+    url:
+      authuser: 'http://localhost:8082'

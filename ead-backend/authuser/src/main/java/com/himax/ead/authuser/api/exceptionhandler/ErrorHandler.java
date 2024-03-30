@@ -39,7 +39,7 @@ public class ErrorHandler {
     }
 
     private ProblemDetail setupProblemDetail(Exception ex, HttpStatus status,HttpServletRequest servletRequest, MessageSource messageSource) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(status);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(getHttpStatus(ex));
         setTitleAndDetail(problemDetail, ex, status);
 
         if(hasFields(ex)){
@@ -100,7 +100,7 @@ public class ErrorHandler {
     public HttpStatus getHttpStatus(Exception ex){
         return switch (getErrorName(ex)) {
             case "ChildNotFoundException","BusinessException","UnrecognizedPropertyException","IgnoredPropertyException" -> HttpStatus.BAD_REQUEST;
-            case "EntityInUseException","AlreadyExistsException" -> HttpStatus.CONFLICT;
+            case "EntityInUseException","AlreadyExistsException","DataIntegrityViolationException" -> HttpStatus.CONFLICT;
             case "EntityNotFoundException" -> HttpStatus.NOT_FOUND;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };

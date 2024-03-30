@@ -1,6 +1,6 @@
 server:
   port: 8082
-  
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5435/ead-course
@@ -18,11 +18,17 @@ spring:
     ansi:
       enabled: ALWAYS
 
-  jackson:
-    deserialization:
-      fail-on-unknown-properties: true
-      fail-on-ignored-properties: true
-  mvc:
-    throw-exception-if-no-handler-found: true
-  web:
-    resources.add-mappings: false
+# Used if you want to control the exact format of response no more fields no less fields
+#  jackson:
+#    deserialization:
+#      fail-on-unknown-properties: true
+#      fail-on-ignored-properties: true
+#  mvc:
+#    throw-exception-if-no-handler-found: true
+#  web:
+#    resources.add-mappings: false
+
+ead:
+  api:
+    url:
+      authuser: 'http://localhost:8081'

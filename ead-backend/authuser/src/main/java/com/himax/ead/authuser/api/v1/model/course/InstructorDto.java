@@ -7,7 +7,6 @@ import java.util.UUID;
 
 @Data
 public class InstructorDto {
-
     @NotNull
     private UUID userId;
 }

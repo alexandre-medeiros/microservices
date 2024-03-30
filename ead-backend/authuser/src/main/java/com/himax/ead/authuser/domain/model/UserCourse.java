@@ -3,6 +3,8 @@ package com.himax.ead.authuser.domain.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "USERS_COURSES")
 public class UserCourse implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -28,5 +31,6 @@ public class UserCourse implements Serializable {
     @Column(nullable = false)
     private String courseId;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Users user;
 }

@@ -1,4 +1,4 @@
-package com.himax.ead.course.api.v1.model;
+package com.himax.ead.authuser.api.v1.model.page;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
