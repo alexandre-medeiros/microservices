@@ -31,7 +31,7 @@ public class UrlHelper {
         return AUTH_USER_URI + "/users/" + userId + "/courses/subscription";
     }
 
-    public String getDeleteSubscriptionUrl(UUID userId) {
-        return AUTH_USER_URI + "/users/" + userId + "/courses/subscription";
+    public String getDeleteCourseInAuthUserUrl(UUID courseId) {
+        return AUTH_USER_URI + "/users/courses/" + courseId;
     }
 }

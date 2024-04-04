@@ -5,22 +5,28 @@ import com.himax.ead.authuser.domain.exception.AlreadyExistsException;
 import com.himax.ead.authuser.domain.model.UserCourse;
 import com.himax.ead.authuser.domain.model.Users;
 import com.himax.ead.authuser.domain.repository.UserCourseRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
-@AllArgsConstructor
 @Service
 public class UserCourseService {
-    private UserCourseRepository userCourseRepository;
-    private UserRegistryService userService;
 
-    public boolean existsByUserAndCourseId(Users userModel, UUID courseId) {
-        return userCourseRepository.existsByUserAndCourseId(userModel, courseId);
+    private final UserCourseRepository userCourseRepository;
+    private final UserRegistryService userService;
+
+    public UserCourseService(UserCourseRepository userCourseRepository, @Lazy UserRegistryService userService) {
+        this.userCourseRepository = userCourseRepository;
+        this.userService = userService;
     }
+
     public boolean subscriptionExists(UUID userId, UUID courseId) {
         return userCourseRepository.subscriptionExists(userId, courseId.toString()).isPresent();
+    }
+
+    public boolean subscriptionExistsByUser(UUID userId) {
+        return !userCourseRepository.subscriptionExistsByUser(userId).isEmpty();
     }
 
     @Transactional
@@ -32,8 +38,13 @@ public class UserCourseService {
         return userCourseRepository.save(userCourse);
     }
 
+    @Transactional
+    public void deleteUserCourse(String courseId) {
+        userCourseRepository.deleteByCourseId(courseId);
+    }
+
     private void subscriptionVerification(UUID userId, UUID courseId) {
-        if(subscriptionExists(userId, courseId)){
+        if (subscriptionExists(userId, courseId)) {
             throw new AlreadyExistsException(GetMessages.getSubscriptionAlreadyExist(userId, courseId));
         }
     }

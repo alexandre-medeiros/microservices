@@ -1,7 +1,11 @@
 server:
   port: 8082
+  servlet:
+    context-path: '/ead-course/'
 
 spring:
+  application:
+    name: ead-course-service
   datasource:
     url: jdbc:postgresql://localhost:5435/ead-course
     username: ${POSTGRES_USER}
@@ -18,6 +22,17 @@ spring:
     ansi:
       enabled: ALWAYS
 
+ead:
+  api:
+    url:
+      authuser: 'http://ead-authuser-service/ead-authuser'
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: 'http://localhost:8761/eureka'
+  instance:
+    hostname: localhost
 # Used if you want to control the exact format of response no more fields no less fields
 #  jackson:
 #    deserialization:
@@ -27,8 +42,3 @@ spring:
 #    throw-exception-if-no-handler-found: true
 #  web:
 #    resources.add-mappings: false
-
-ead:
-  api:
-    url:
-      authuser: 'http://localhost:8081'

@@ -4,7 +4,6 @@ import com.himax.ead.course.api.v1.mapper.course.CourseUserMapper;
 import com.himax.ead.course.api.v1.model.CourseUserDto;
 import com.himax.ead.course.api.v1.model.SubscriptionDto;
 import com.himax.ead.course.api.v1.model.UserDto;
-import com.himax.ead.course.client.AuthUserClient;
 import com.himax.ead.course.domain.model.CourseUser;
 import com.himax.ead.course.domain.service.CourseUserService;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,21 +46,32 @@ public class ApiCompositionCourseUserController {
             * Greater coupling between Microservices
             * Data consistency may be affected
      */
-    private AuthUserClient client;
     private CourseUserService service;
     private CourseUserMapper mapper;
 
     @GetMapping("/{courseId}/users")
-    public Page<UserDto> findAllUsersByCourse(
+    public ResponseEntity<Object> findAllUsersByCourse(
             @PathVariable UUID courseId,
             @PageableDefault(page = 0, size = 10, sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
-        return client.findAllUsers(courseId, pageable);
+        Page<UserDto> users = service.findAllUsers(courseId, pageable);
+
+        if (!users.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(users);
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PostMapping("/{courseId}/users/subscription")
     @ResponseStatus(HttpStatus.CREATED)
     public CourseUserDto saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody SubscriptionDto dto) {
-        CourseUser courseUser =service.saveSubscriptionAndSendInfoToAuthUser(courseId,dto.getUserId());
+        CourseUser courseUser = service.saveSubscriptionAndSendInfoToAuthUser(courseId, dto.getUserId());
         return mapper.toDto(courseUser);
+    }
+
+    @DeleteMapping("/users/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserInCourse(@PathVariable UUID userId) {
+        service.deleteCourseUserByUserId(userId);
     }
 }

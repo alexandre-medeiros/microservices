@@ -85,15 +85,13 @@ public class AuthUserClient {
         log.info("Ending post info subscription with course id {} and user id {} ", courseId, userId);
     }
 
-    public void deleteUserCourse(UUID id) {
-//        String url = urlHelper.getPostSubscriptionUrl(id);
-//        CourseUserDto courseUserDto = new CourseUserDto(courseId, userId, null);
-//
-//        log.debug(REQUEST_URL, url);
-//        log.info(REQUEST_URL, url);
-//
-//        restTemplate.postForObject(url, courseUserDto, String.class);
-//        log.info("Ending post info subscription with course id {} and user id {} ", courseId, userId);
+    public void deleteCourseInAuthUser(UUID id) {
+        String url = urlHelper.getDeleteCourseInAuthUserUrl(id);
 
+        log.debug(REQUEST_URL, url);
+        log.info(REQUEST_URL, url);
+
+        restTemplate.delete(url);
+        log.info("Ending delete userCourse subscription with course id {}", id);
     }
 }

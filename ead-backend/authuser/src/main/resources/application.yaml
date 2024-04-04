@@ -1,11 +1,18 @@
 server:
   port: 8081
-  
+  servlet:
+    context-path: '/ead-authuser/'
+
 spring:
+  application:
+    name: ead-authuser-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/ead-authuser 
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    url: jdbc:postgresql://localhost:5433/ead-authuser
+    username: administrator
+    password: administrator
+  #    username: ${POSTGRES_USER}
+  #    password: ${POSTGRES_PASSWORD}
+
 
   sql:
     init:
@@ -22,6 +29,18 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+ead:
+  api:
+    url:
+      course: 'http://ead-course-service/ead-course'
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: 'http://localhost:8761/eureka'
+  instance:
+    hostname: localhost
+
 # Used if you want to control the exact format of response no more fields no less fields
 #  jackson:
 #    deserialization:
@@ -35,8 +54,3 @@ spring:
 #logging:
 #  level:
 #    com.himax.ead: DEBUG
-
-ead:
-  api:
-    url:
-      authuser: 'http://localhost:8082'

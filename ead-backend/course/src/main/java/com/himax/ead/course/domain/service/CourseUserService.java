@@ -10,16 +10,21 @@ import com.himax.ead.course.domain.model.Course;
 import com.himax.ead.course.domain.model.CourseUser;
 import com.himax.ead.course.domain.repository.CourseUserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @AllArgsConstructor
 @Service
 public class CourseUserService {
+
     private CourseUserRepository repository;
-    private AuthUserClient client;
     private CourseService service;
+    private AuthUserClient client;
 
     @Transactional
     public CourseUser saveSubscriptionAndSendInfoToAuthUser(UUID courseId, UUID userId) {
@@ -32,8 +37,25 @@ public class CourseUserService {
         return courseUser;
     }
 
+    public boolean existsCourseUserToCourse(UUID courseId) {
+        return !repository.findAllCourseUserIntoCourse(courseId)
+                .isEmpty();
+    }
+
+    public Page<UserDto> findAllUsers(UUID courseId, Pageable pageable) {
+        if (existsCourseUserToCourse(courseId)) {
+            return client.findAllUsers(courseId, pageable);
+        }
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);
+    }
+
+    @Transactional
+    public void deleteCourseUserByUserId(UUID userId) {
+        repository.deleteAllByUserId(userId);
+    }
+
     private void isUserValid(UUID userId, UserDto user) {
-        if(isNotActive(user)){
+        if (isNotActive(user)) {
             throw new BusinessException(String.format("User with id %s is not ACTIVE ", userId));
         }
     }

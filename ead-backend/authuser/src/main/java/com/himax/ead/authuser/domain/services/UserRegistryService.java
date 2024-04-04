@@ -1,6 +1,7 @@
 package com.himax.ead.authuser.domain.services;
 
 import com.himax.ead.authuser.api.v1.model.user.UserFilter;
+import com.himax.ead.authuser.client.CourseClient;
 import com.himax.ead.authuser.domain.enums.UserStatus;
 import com.himax.ead.authuser.domain.enums.UserType;
 import com.himax.ead.authuser.domain.exception.AlreadyExistsException;
@@ -20,27 +21,34 @@ import java.util.UUID;
 @AllArgsConstructor
 @Service
 public class UserRegistryService {
+
     private UserRepository repository;
+    private UserCourseService service;
+    private CourseClient client;
 
     public Page<Users> findAllWithFilter(UserFilter filter, String courseId, Pageable pageable) {
         UserStatus userStatus = filter.getUserStatus();
         UserType userType = filter.getUserType();
         String email = filter.getEmail();
         String fullName = filter.getFullName();
-        return repository.findAllWithFilter(courseId,userStatus,userType,email,fullName,pageable);
+        return repository.findAllWithFilter(courseId, userStatus, userType, email, fullName, pageable);
     }
 
     public Users find(UUID id) {
         return repository.findById(id)
-                .orElseThrow(()->
+                .orElseThrow(() ->
                         new EntityNotFoundException(String.format("User with id %s do not exist", id)));
     }
 
+    @Transactional
     public void remove(UUID id) {
         find(id);
-        try{
+        if (service.subscriptionExistsByUser(id)) {
+            client.deleteUserInCourse(id);
+        }
+        try {
             repository.deleteById(id);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new EntityInUseException(String.format("User with id %s can not be deleted because is in use", id));
         }
     }
@@ -49,20 +57,20 @@ public class UserRegistryService {
     public Users create(Users user) {
         boolean existsSameUserName = repository
                 .findByUsername(user.getUsername())
-                .filter(u->!u.equals(user))
+                .filter(u -> !u.equals(user))
                 .isPresent();
 
-        if(existsSameUserName){
+        if (existsSameUserName) {
             log.warn("Already exist another user with same user name {}}", user.getUsername());
             throw new AlreadyExistsException(String.format("Already exist another user with same user name %s", user.getUsername()));
         }
 
         boolean existsSameEmail = repository
                 .findByEmail(user.getEmail())
-                .filter(u->!u.equals(user))
+                .filter(u -> !u.equals(user))
                 .isPresent();
 
-        if(existsSameEmail){
+        if (existsSameEmail) {
             log.warn("Already exist another user with same email {}", user.getEmail());
             throw new AlreadyExistsException(String.format("Already exist another user with same email %s", user.getEmail()));
         }
@@ -72,9 +80,9 @@ public class UserRegistryService {
         return repository.save(user);
     }
 
-    public Users findbyUserName(String userName){
+    public Users findbyUserName(String userName) {
         return repository.findByUsername(userName)
-                .orElseThrow(()->
+                .orElseThrow(() ->
                         new EntityNotFoundException(String.format("User with userName %s do not exist", userName)));
     }
 

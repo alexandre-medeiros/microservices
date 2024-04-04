@@ -8,6 +8,7 @@ import com.himax.ead.course.domain.enums.CourseStatus;
 import com.himax.ead.course.domain.exception.EntityNotFoundException;
 import com.himax.ead.course.domain.model.Course;
 import com.himax.ead.course.domain.repository.CourseRepository;
+import com.himax.ead.course.domain.repository.CourseUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,23 +20,25 @@ import java.util.UUID;
 @Service
 public class CourseService {
 
-    private CourseRepository courseRepository;
+    private CourseUserRepository courseUserRepository;
+    private CourseRepository repository;
     private AuthUserClient client;
 
     @Transactional
     public void delete(Course course) {
-        courseRepository.delete(course);
-        client.deleteUserCourse(course.getId());
-
+        repository.delete(course);
+        if (existsCourseUser(course)) {
+            client.deleteCourseInAuthUser(course.getId());
+        }
     }
 
     @Transactional
     public Course save(Course course) {
-        return courseRepository.save(course);
+        return repository.save(course);
     }
 
     public Course findById(UUID courseId) {
-        return courseRepository.findById(courseId)
+        return repository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException(GetMessages.getCourseNotExist(courseId)));
     }
 
@@ -43,6 +46,12 @@ public class CourseService {
         CourseLevel courseLevel = filter.getCourseLevel();
         CourseStatus courseStatus = filter.getCourseStatus();
         String name = filter.getName();
-        return courseRepository.findAllWithFilter(courseLevel, courseStatus, name, userId, pageable);
+        return repository.findAllWithFilter(courseLevel, courseStatus, name, userId, pageable);
+    }
+
+    private boolean existsCourseUser(Course course) {
+        return courseUserRepository
+                .findAllCourseUserIntoCourse(course.getId())
+                .isEmpty();
     }
 }

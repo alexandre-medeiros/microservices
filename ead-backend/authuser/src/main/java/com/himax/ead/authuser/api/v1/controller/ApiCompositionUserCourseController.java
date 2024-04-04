@@ -27,7 +27,7 @@ import java.util.UUID;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping("users")
+@RequestMapping
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ApiCompositionUserCourseController {
 
@@ -49,14 +49,14 @@ public class ApiCompositionUserCourseController {
     private UserCourseService userCourseService;
     private UserCourseMapper mapper;
 
-    @GetMapping("/{userId}/courses")
+    @GetMapping("users/{userId}/courses")
     public Page<CourseDto> findAllCoursesByUser(
             @PathVariable UUID userId,
             @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return client.getAllCourses(userId, pageable);
     }
 
-    @PostMapping("/{userId}/courses/subscription")
+    @PostMapping("users/{userId}/courses/subscription")
     @ResponseStatus(HttpStatus.CREATED)
     public UserCourseDto subscriptionInCourse(@PathVariable UUID userId,
                                               @RequestBody UserCourseDto dto) {
@@ -64,11 +64,9 @@ public class ApiCompositionUserCourseController {
         return mapper.toDto(userCourse);
     }
 
-    @DeleteMapping("/{userId}/courses/subscription")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserCourseDto deleteSubscriptionInCourse(@PathVariable UUID courseId) {
-//        UserCourse userCourse = userCourseService.save(userId, dto.getCourseId());
-//        return mapper.toDto(userCourse);
-        return null;
+    @DeleteMapping("users/courses/{courseId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSubscriptionInCourse(@PathVariable String courseId) {
+        userCourseService.deleteUserCourse(courseId);
     }
 }
