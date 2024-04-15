@@ -2,8 +2,6 @@ package com.himax.ead.course.domain.model;
 
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,8 +17,9 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "TB_MODULES")
+@Table(name = "MODULES")
 public class Modules {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -36,6 +35,5 @@ public class Modules {
     private Course course;
 
     @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Lesson> lessons;
 }

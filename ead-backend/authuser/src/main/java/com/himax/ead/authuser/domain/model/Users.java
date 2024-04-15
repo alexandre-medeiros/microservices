@@ -1,5 +1,6 @@
 package com.himax.ead.authuser.domain.model;
 
+import com.himax.ead.authuser.api.v1.model.user.UserEventDto;
 import com.himax.ead.authuser.domain.enums.UserStatus;
 import com.himax.ead.authuser.domain.enums.UserType;
 import com.himax.ead.authuser.domain.exception.BusinessException;
@@ -9,22 +10,18 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.beans.BeanUtils;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.Set;
 import java.util.UUID;
 @Data
 @Log4j2
@@ -66,9 +63,14 @@ public class Users implements Serializable {
     @UpdateTimestamp
     @Column(nullable = false)
     private OffsetDateTime lastUpdateDate;
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<UserCourse> usersCourses;
+
+    public UserEventDto toDto() {
+        UserEventDto dto = new UserEventDto();
+        BeanUtils.copyProperties(this, dto);
+        dto.setUserStatus(this.getUserStatus().toString());
+        dto.setUserType(this.getUserType().toString());
+        return dto;
+    }
 
     public void verifyCurrentAndNewPassword(String entered, String newPassword) {
         passwordEnteredIsTheSameAsRegistered(entered);
@@ -89,20 +91,4 @@ public class Users implements Serializable {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Users{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", userStatus=" + userStatus +
-                ", userType=" + userType +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", cpf='" + cpf + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", creationDate=" + creationDate +
-                ", lastUpdateDate=" + lastUpdateDate +
-                '}';
-    }
 }

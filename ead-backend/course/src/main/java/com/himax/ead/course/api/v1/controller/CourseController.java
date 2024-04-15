@@ -1,16 +1,12 @@
 package com.himax.ead.course.api.v1.controller;
 
-import com.himax.ead.course.api.exceptionhandler.ErrorHandler;
-import com.himax.ead.course.api.exceptionhandler.ProblemDetail;
 import com.himax.ead.course.api.v1.mapper.course.CourseMapper;
 import com.himax.ead.course.api.v1.model.CourseDto;
 import com.himax.ead.course.api.v1.model.CourseFilter;
-import com.himax.ead.course.core.validators.CourseValidator;
 import com.himax.ead.course.domain.model.Course;
 import com.himax.ead.course.domain.service.CourseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -43,20 +39,25 @@ public class CourseController {
 
     private CourseService courseService;
     private CourseMapper mapper;
-    private CourseValidator validator;
-    private ErrorHandler errorHandler;
-    private MessageSource messageSource;
+
+    @GetMapping
+    public Page<CourseDto> getAllCourses(
+            @Valid CourseFilter filter,
+            @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) UUID userId) {
+        List<CourseDto> list = mapper.toDtoList(courseService.findAllWithFilter(filter, userId, pageable).toList());
+        return new PageImpl<>(list, pageable, list.size());
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public CourseDto getOneCourse(@PathVariable UUID id) {
+        return mapper.toDto(courseService.findById(id));
+    }
 
     @PostMapping
-    public ResponseEntity<Object> saveCourse(@RequestBody CourseDto dto, Errors errors) {
+    public ResponseEntity<Object> saveCourse(@RequestBody @Valid CourseDto dto, Errors errors) {
         log.debug("POST saveCourse courseDto received {} ", dto.toString());
-        validator.validate(dto, errors);
-
-        if (errors.hasErrors()) {
-            ProblemDetail problemDetail = errorHandler.handleErrors(messageSource, errors);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
-        }
-
         Course course = mapper.toDomain(dto);
         Course saved = courseService.save(course);
         log.debug("POST saveCourse courseId saved {} ", saved.getId());
@@ -83,20 +84,5 @@ public class CourseController {
         log.debug("PUT updateCourse courseId saved {} ", courseModel.getId());
         log.info("Course updated successfully courseId {} ", courseModel.getId());
         return mapper.toDto(courseModel);
-    }
-
-    @GetMapping
-    public Page<CourseDto> getAllCourses(
-            @Valid CourseFilter filter,
-            @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-            @RequestParam(required = false) UUID userId) {
-        List<CourseDto> list = mapper.toDtoList(courseService.findAllWithFilter(filter, userId, pageable).toList());
-        return new PageImpl<>(list, pageable, list.size());
-    }
-
-    @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public CourseDto getOneCourse(@PathVariable UUID id) {
-        return mapper.toDto(courseService.findById(id));
     }
 }

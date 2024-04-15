@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CourseUser {
+public class CourseUserService {
 
     private final CourseService courseService;
     private final UserService userService;
@@ -20,11 +20,10 @@ public class CourseUser {
     public Course saveSubscriptionUserInCourse(UUID courseId, UUID userId) {
         Course course = courseService.findById(courseId);
         Users user = userService.findById(userId);
-
-        boolean subscriptionNoExists = course.getUsers().stream()
+        boolean subscriptionNotExists = course.getUsers().stream()
                 .noneMatch(u -> u.equals(user));
 
-        if (subscriptionNoExists) {
+        if (subscriptionNotExists) {
             course.addUser(user);
             return course;
         } else {

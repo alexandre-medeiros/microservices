@@ -13,14 +13,15 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID> {
-    @Query("select C from Course C LEFT JOIN C.coursesUsers U " +
-            "where (cast(:userId as org.hibernate.type.UUIDCharType) IS NULL OR U.userId = :userId)"+
-            "  and (:courseLevel IS NULL  or C.courseLevel = :courseLevel)"+
-            "  and (:courseStatus IS NULL  or C.courseStatus = :courseStatus)"+
+
+    @Query("select C from Course C LEFT JOIN C.users U " +
+            "where (cast(:userId as org.hibernate.type.UUIDCharType) IS NULL OR U.id = :userId)" +
+            "  and (:courseLevel IS NULL  or C.courseLevel = :courseLevel)" +
+            "  and (:courseStatus IS NULL  or C.courseStatus = :courseStatus)" +
             "  and (:name IS NULL  or C.name like (%:name%))")
     Page<Course> findAllWithFilter(@Param("courseLevel") CourseLevel courseLevel,
-                                  @Param("courseStatus") CourseStatus courseStatus,
-                                  @Param("name") String name,
-                                  @Param("userId") UUID userId,
-                                  Pageable pageable);
+                                   @Param("courseStatus") CourseStatus courseStatus,
+                                   @Param("name") String name,
+                                   @Param("userId") UUID userId,
+                                   Pageable pageable);
 }

@@ -3,7 +3,6 @@ package com.himax.ead.course.domain.service;
 import com.himax.ead.course.api.exceptionhandler.GetMessages;
 import com.himax.ead.course.domain.exception.EntityNotFoundException;
 import com.himax.ead.course.domain.model.Modules;
-import com.himax.ead.course.domain.repository.LessonRepository;
 import com.himax.ead.course.domain.repository.ModuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,14 +19,6 @@ public class ModuleService {
     @Autowired
     ModuleRepository moduleRepository;
 
-    @Autowired
-    LessonRepository lessonRepository;
-
-    @Transactional
-    public void delete(Modules moduleModel) {
-        moduleRepository.delete(moduleModel);
-    }
-
     @Transactional
     public Modules save(Modules moduleModel) {
         return moduleRepository.save(moduleModel);
@@ -43,10 +34,22 @@ public class ModuleService {
 
     public Modules findById(UUID moduleId) {
         return moduleRepository.findById(moduleId)
-                .orElseThrow(()-> new EntityNotFoundException(GetMessages.getModuleNotExist(moduleId)));
+                .orElseThrow(() -> new EntityNotFoundException(GetMessages.getModuleNotExist(moduleId)));
     }
 
     public Page<Modules> findAllByCourse(Pageable pageable) {
         return moduleRepository.findAll(pageable);
     }
+
+    @Transactional
+    public void delete(Modules moduleModel) {
+        moduleRepository.delete(moduleModel);
+    }
+
+    @Transactional
+    public void deleteModulesByCourse(UUID courseId) {
+        moduleRepository.deleteModuleByCourseId(courseId);
+    }
+
+
 }

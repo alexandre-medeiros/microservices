@@ -6,11 +6,15 @@ server:
 spring:
   application:
     name: ead-course-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: password
   datasource:
     url: jdbc:postgresql://localhost:5435/ead-course
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
-
   sql:
     init:
       mode: always
@@ -26,6 +30,12 @@ ead:
   api:
     url:
       authuser: 'http://ead-authuser-service/ead-authuser'
+  broker:
+    exchange:
+      userEventExchange: ead.userevent
+    queue:
+      userEventQueue:
+        name: ead.userevent.ms.course
 
 eureka:
   client:
@@ -33,6 +43,7 @@ eureka:
       defaultZone: 'http://localhost:8761/eureka'
   instance:
     hostname: localhost
+#
 # Used if you want to control the exact format of response no more fields no less fields
 #  jackson:
 #    deserialization:

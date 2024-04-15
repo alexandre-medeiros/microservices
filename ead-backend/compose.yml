@@ -6,8 +6,8 @@ services:
     container_name: ead-authuser
     environment:
       POSTGRES_DB: ead-authuser
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: administrator
+      POSTGRES_PASSWORD: administrator
     ports:
       - "5433:5432"
     networks:
@@ -18,8 +18,8 @@ services:
     container_name: ead-notification
     environment:
       POSTGRES_DB: ead-notification
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: administrator
+      POSTGRES_PASSWORD: administrator
     ports:
       - "5434:5432"
     networks:
@@ -30,10 +30,22 @@ services:
     container_name: ead-course
     environment:
       POSTGRES_DB: ead-course
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: administrator
+      POSTGRES_PASSWORD: administrator
     ports:
       - "5435:5432"
+    networks:
+      - ead-network
+
+  rabbitmq:
+    image: rabbitmq:3.12.13-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # AMQP
+      - "15672:15672"  # RabbitMQ Management Plugin
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
     networks:
       - ead-network
 

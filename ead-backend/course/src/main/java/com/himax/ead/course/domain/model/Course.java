@@ -5,8 +5,6 @@ import com.himax.ead.course.domain.enums.CourseLevel;
 import com.himax.ead.course.domain.enums.CourseStatus;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,19 +14,22 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "TB_COURSES")
+@Table(name = "COURSES")
 public class Course implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -56,14 +57,18 @@ public class Course implements Serializable {
     private UUID userInstructor;
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Modules> modules;
+    private Set<Modules> modules;
 
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<CourseUser> coursesUsers;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "courses_users")
+    private Set<Users> users;
 
-    public CourseUser convertToCourseUser(UUID userId) {
-        return new CourseUser(null, userId, this);
+    public void addUser(Users user) {
+        users.add(user);
+    }
+
+    public boolean isUserNotValidToCreateCourse(Users user) {
+        return !(user.isActive() &&
+                (user.isInstructor() || user.isAdministrator()));
     }
 }

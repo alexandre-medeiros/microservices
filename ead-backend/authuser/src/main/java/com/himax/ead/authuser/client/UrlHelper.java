@@ -12,11 +12,7 @@ public class UrlHelper {
     @Value("${ead.api.url.course}")
     private String COURSE_URI;
 
-    public String getDeleteUserInCourseUrl(UUID userId) {
-        return COURSE_URI + "/courses/users/" + userId;
-    }
-
-    public String getFindAllCoursesUrl(UUID userId, Pageable pageable) {
+    public String getFindAllCoursesByUserUrl(UUID userId, Pageable pageable) {
         String url = COURSE_URI + "/courses";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url)
                 .queryParam("userId", userId)

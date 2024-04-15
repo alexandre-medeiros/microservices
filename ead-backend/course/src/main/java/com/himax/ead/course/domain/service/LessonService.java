@@ -24,12 +24,17 @@ public class LessonService {
 
     public Lesson findLessonIntoModule(UUID moduleId, UUID lessonId) {
         return lessonRepository.findLessonIntoModule(moduleId, lessonId)
-                .orElseThrow(()-> new EntityNotFoundException(GetMessages.getLessonNotExist(lessonId)));
+                .orElseThrow(() -> new EntityNotFoundException(GetMessages.getLessonNotExist(lessonId)));
     }
 
     @Transactional
     public void delete(Lesson lessonModel) {
         lessonRepository.delete(lessonModel);
+    }
+
+    @Transactional
+    public void deleteLessonByCourseId(UUID courseId) {
+        lessonRepository.deleteLessonByCourseId(courseId);
     }
 
     public List<Lesson> findAllByModule(UUID moduleId) {

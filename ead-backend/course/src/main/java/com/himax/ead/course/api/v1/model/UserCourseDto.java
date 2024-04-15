@@ -6,13 +6,9 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class UserDto {
+public class UserCourseDto {
 
     private UUID id;
     private String email;
     private String fullName;
-    private String userStatus;
-    private String userType;
-    private String cpf;
-    private String imageUrl;
 }

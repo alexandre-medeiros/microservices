@@ -1,15 +1,19 @@
 package com.himax.ead.course.api.v1.controller;
 
-import com.himax.ead.course.api.v1.mapper.course.CourseUserMapper;
+import com.himax.ead.course.api.v1.mapper.course.CourseMapper;
+import com.himax.ead.course.api.v1.mapper.user.UserMapper;
 import com.himax.ead.course.api.v1.model.CourseUserDto;
 import com.himax.ead.course.api.v1.model.SubscriptionDto;
 import com.himax.ead.course.api.v1.model.UserDto;
-import com.himax.ead.course.client.AuthUserClient;
-import com.himax.ead.course.domain.model.CourseUser;
+import com.himax.ead.course.api.v1.model.UserFilter;
+import com.himax.ead.course.domain.model.Course;
+import com.himax.ead.course.domain.model.Users;
 import com.himax.ead.course.domain.service.CourseUserService;
+import com.himax.ead.course.domain.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @Log4j2
@@ -29,37 +35,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @RequestMapping("courses")
 @CrossOrigin(origins = "*", maxAge = 3600)
-public class ApiCompositionCourseUserController {
+public class CourseUserController {
 
-    /*
-        API Composition Pattern
-        Implementation of queries that retrieve data from multiple Microservices,
-        querying each of them through their respective APIs, combining these results.
-        Pros:
-            * Ideal for consultations in a Microservices Architecture
-            * Simple way to consult and combine data from multiple services
-            * Different ways of implement this Pattern
-
-        Cons:
-            * Reduced availability
-            * Greater coupling between Microservices
-            * Data consistency may be affected
-     */
-    private AuthUserClient client;
-    private CourseUserService service;
-    private CourseUserMapper mapper;
+    private UserService service;
+    private CourseUserService courseUserService;
+    private UserMapper userMapper;
+    private CourseMapper courseMapper;
 
     @GetMapping("/{courseId}/users")
-    public Page<UserDto> findAllUsersByCourse(
-            @PathVariable UUID courseId,
-            @PageableDefault(page = 0, size = 10, sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
-        return client.findAllUsers(courseId, pageable);
+    public Page<UserDto> findAllUsersByCourse(@Valid UserFilter filter, @PathVariable UUID courseId,
+                                              @PageableDefault(page = 0, size = 10, sort = "fullName", direction = Sort.Direction.ASC) Pageable pageable) {
+        List<Users> users = service.findAllWithFilter(filter, courseId, pageable);
+        List<UserDto> usersDto = userMapper.toListDto(users);
+        return new PageImpl<>(usersDto, pageable, usersDto.size());
     }
 
     @PostMapping("/{courseId}/users/subscription")
     @ResponseStatus(HttpStatus.CREATED)
     public CourseUserDto saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody SubscriptionDto dto) {
-        CourseUser courseUser =service.saveSubscriptionAndSendInfoToAuthUser(courseId,dto.getUserId());
-        return mapper.toDto(courseUser);
+        Course course = courseUserService.saveSubscriptionUserInCourse(courseId, dto.getUserId());
+        return courseMapper.toCourseUserDto(course);
     }
 }

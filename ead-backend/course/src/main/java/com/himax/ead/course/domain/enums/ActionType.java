@@ -1,7 +1,7 @@
-package com.himax.ead.authuser.domain.enums;
+package com.himax.ead.course.domain.enums;
 
 public enum ActionType {
     CREATE,
     UPDATE,
-    DELETE;
+    DELETE
 }

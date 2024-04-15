@@ -1,7 +1,7 @@
 package com.himax.ead.authuser.domain.services;
 
 import com.himax.ead.authuser.api.v1.model.user.UserFilter;
-import com.himax.ead.authuser.client.CourseClient;
+import com.himax.ead.authuser.api.v1.publishers.UserEventPublisher;
 import com.himax.ead.authuser.domain.enums.UserStatus;
 import com.himax.ead.authuser.domain.enums.UserType;
 import com.himax.ead.authuser.domain.exception.AlreadyExistsException;
@@ -17,21 +17,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
+import static com.himax.ead.authuser.domain.enums.ActionType.CREATE;
+import static com.himax.ead.authuser.domain.enums.ActionType.DELETE;
+import static com.himax.ead.authuser.domain.enums.ActionType.UPDATE;
+
 @Log4j2
 @AllArgsConstructor
 @Service
 public class UserRegistryService {
 
     private UserRepository repository;
-    private UserCourseService service;
-    private CourseClient client;
+    private UserEventPublisher userEventPublisher;
 
-    public Page<Users> findAllWithFilter(UserFilter filter, String courseId, Pageable pageable) {
+    public Page<Users> findAllWithFilter(UserFilter filter, Pageable pageable) {
         UserStatus userStatus = filter.getUserStatus();
         UserType userType = filter.getUserType();
         String email = filter.getEmail();
         String fullName = filter.getFullName();
-        return repository.findAllWithFilter(courseId, userStatus, userType, email, fullName, pageable);
+        return repository.findAllWithFilter(userStatus, userType, email, fullName, pageable);
     }
 
     public Users find(UUID id) {
@@ -40,17 +43,10 @@ public class UserRegistryService {
                         new EntityNotFoundException(String.format("User with id %s do not exist", id)));
     }
 
-    @Transactional
-    public void remove(UUID id) {
-        find(id);
-        if (service.subscriptionExistsByUser(id)) {
-            client.deleteUserInCourse(id);
-        }
-        try {
-            repository.deleteById(id);
-        } catch (Exception ex) {
-            throw new EntityInUseException(String.format("User with id %s can not be deleted because is in use", id));
-        }
+    public Users findbyUserName(String userName) {
+        return repository.findByUsername(userName)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(String.format("User with userName %s do not exist", userName)));
     }
 
     @Transactional
@@ -75,15 +71,14 @@ public class UserRegistryService {
             throw new AlreadyExistsException(String.format("Already exist another user with same email %s", user.getEmail()));
         }
 
-        user.setUserStatus(UserStatus.ACTIVE);
-        user.setUserType(UserType.STUDENT);
         return repository.save(user);
     }
 
-    public Users findbyUserName(String userName) {
-        return repository.findByUsername(userName)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(String.format("User with userName %s do not exist", userName)));
+    @Transactional
+    public Users saveAndPublish(Users user) {
+        user = create(user);
+        userEventPublisher.publishUserEvent(user.toDto(), CREATE);
+        return user;
     }
 
     @Transactional
@@ -92,9 +87,28 @@ public class UserRegistryService {
     }
 
     @Transactional
+    public Users updateAndPublish(Users user) {
+        user = create(user);
+        userEventPublisher.publishUserEvent(user.toDto(), UPDATE);
+        return user;
+    }
+
+    @Transactional
     public Users saveInstructor(UUID userId) {
         Users user = find(userId);
         user.setUserType(UserType.INSTRUCTOR);
-        return repository.save(user);
+        return updateAndPublish(user);
+    }
+
+    @Transactional
+    public void remove(UUID id) {
+        Users user = find(id);
+
+        try {
+            repository.deleteById(id);
+            userEventPublisher.publishUserEvent(user.toDto(), DELETE);
+        } catch (Exception ex) {
+            throw new EntityInUseException(String.format("User with id %s can not be deleted because is in use", id));
+        }
     }
 }
