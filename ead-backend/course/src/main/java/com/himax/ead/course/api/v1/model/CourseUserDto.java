@@ -1,15 +1,27 @@
 package com.himax.ead.course.api.v1.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+
+import com.himax.ead.course.domain.enums.CourseLevel;
+import com.himax.ead.course.domain.enums.CourseStatus;
+import lombok.Getter;
+import lombok.Setter;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-public class CourseUserDto {
-    private final UUID id;
+@Getter
+@Setter
+public class CourseDto {
+    private UUID id;
+    @NotBlank
+    private String name;
+    @NotBlank
+    private String description;
+    private String imageUrl;
     @NotNull
-    private final UUID userId;
-    private CourseDto course;
+    private CourseStatus courseStatus;
+    @NotNull
+    private UUID userInstructor;
+    @NotNull
+    private CourseLevel courseLevel;
 }
