@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class UserRegistryService {
     public Users findbyUserName(String userName) {
         return repository.findByUsername(userName)
                 .orElseThrow(() ->
-                        new EntityNotFoundException(String.format("User with userName %s do not exist", userName)));
+                        new UsernameNotFoundException(String.format("User with userName %s do not exist", userName)));
     }
 
     @Transactional

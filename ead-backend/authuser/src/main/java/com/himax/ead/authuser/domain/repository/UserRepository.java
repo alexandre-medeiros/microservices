@@ -13,6 +13,10 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<Users, UUID> {
 
+    Optional<Users> findByEmail(String email);
+
+    Optional<Users> findByUsername(String username);
+
     @Query("select distinct U from Users U " +
             "where (:userStatus is null or U.userStatus = :userStatus)" +
             "  and (:userType is null or U.userType = :userType)" +
@@ -24,7 +28,6 @@ public interface UserRepository extends JpaRepository<Users, UUID> {
                                   @Param("fullName") String fullName,
                                   Pageable pageable);
 
-    Optional<Users> findByEmail(String email);
-
-    Optional<Users> findByUsername(String username);
+    @Query("SELECT U FROM Users U join fetch U.roles WHERE U.username = :username")
+    Optional<Users> loadUserByUsername(String username);
 }

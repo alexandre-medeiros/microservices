@@ -1,8 +1,8 @@
 spring:
   application:
-    name: ead-authuser-service
+    name: ead-notification-service
   config:
-    import: 'configserver:'
+    import: 'optional:configserver:'
 
   # Necessary because the registration name is not default, just 'configserver'
   cloud:

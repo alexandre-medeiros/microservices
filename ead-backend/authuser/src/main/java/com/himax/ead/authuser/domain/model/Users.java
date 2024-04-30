@@ -12,16 +12,24 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 @Data
 @Log4j2
@@ -64,12 +72,39 @@ public class Users implements Serializable {
     @Column(nullable = false)
     private OffsetDateTime lastUpdateDate;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "users_id"),
+            inverseJoinColumns = @JoinColumn(name = "roles_id"))
+    private Set<Roles> roles;
+
+    public void addRole(Roles role) {
+        if (roles == null) {
+            roles = new HashSet<>();
+        }
+        roles.add(role);
+    }
+
     public UserEventDto toDto() {
         UserEventDto dto = new UserEventDto();
         BeanUtils.copyProperties(this, dto);
         dto.setUserStatus(this.getUserStatus().toString());
         dto.setUserType(this.getUserType().toString());
         return dto;
+    }
+
+    public UserDetails toUserDetails() {
+        return User
+                .withUsername(this.username)
+                .password(this.password)
+                .authorities(toAuthorities())
+                .build();
+    }
+
+    public String[] toAuthorities() {
+        return roles.stream()
+                .map(Roles::getAuthority)
+                .toArray(String[]::new);
     }
 
     public void verifyCurrentAndNewPassword(String entered, String newPassword) {
