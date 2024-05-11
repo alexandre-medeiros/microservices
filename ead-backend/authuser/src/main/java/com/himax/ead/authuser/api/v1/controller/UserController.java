@@ -6,6 +6,8 @@ import com.himax.ead.authuser.api.v1.model.user.ImageInputDto;
 import com.himax.ead.authuser.api.v1.model.user.UserFilter;
 import com.himax.ead.authuser.api.v1.model.user.UserInputDto;
 import com.himax.ead.authuser.api.v1.model.user.UserOutputDto;
+import com.himax.ead.authuser.core.config.security.AuthenticationCurrentUserService;
+import com.himax.ead.authuser.core.config.security.UserDetailsImpl;
 import com.himax.ead.authuser.domain.model.Users;
 import com.himax.ead.authuser.domain.services.UserRegistryService;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,9 +41,11 @@ import java.util.UUID;
 public class UserController {
 
     private UserRegistryService service;
+    private AuthenticationCurrentUserService currentUserService;
     private UserMapper mapper;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Page<UserOutputDto> findAll(
             @Valid UserFilter filter,
             @PageableDefault(page = 0, size = 10, sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -51,9 +57,16 @@ public class UserController {
         return new PageImpl<>(userOutputDtos);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("{id}")
-    public UserOutputDto find(@PathVariable UUID id) {
+    public UserOutputDto find(@PathVariable UUID id) throws AccessDeniedException {
         log.debug("GET find user with id {}", id);
+        UserDetailsImpl currentUser = currentUserService.getCurrentUser();
+        
+        if (currentUser.isNotTheSameUser(id)) {
+            throw new AccessDeniedException("Forbidden");
+        }
+
         Users user = service.find(id);
         log.debug("GET find returned user {}", user.toString());
         log.info("User with id {} returned successfully", id);

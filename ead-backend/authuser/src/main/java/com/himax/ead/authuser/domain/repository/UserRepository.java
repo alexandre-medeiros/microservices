@@ -30,4 +30,7 @@ public interface UserRepository extends JpaRepository<Users, UUID> {
 
     @Query("SELECT U FROM Users U join fetch U.roles WHERE U.username = :username")
     Optional<Users> loadUserByUsername(String username);
+
+    @Query("SELECT U FROM Users U join fetch U.roles WHERE U.id = :id")
+    Optional<Users> loadUserById(UUID id);
 }

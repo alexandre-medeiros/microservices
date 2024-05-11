@@ -2,8 +2,10 @@ package com.himax.ead.authuser.api.v1.controller;
 
 import com.himax.ead.authuser.api.v1.mapper.UserMapper;
 import com.himax.ead.authuser.api.v1.model.auth.RegistrationInputDto;
+import com.himax.ead.authuser.api.v1.model.security.JwtDto;
 import com.himax.ead.authuser.api.v1.model.security.LoginDto;
 import com.himax.ead.authuser.api.v1.model.user.UserOutputDto;
+import com.himax.ead.authuser.core.config.security.JwtProvider;
 import com.himax.ead.authuser.domain.enums.RoleType;
 import com.himax.ead.authuser.domain.enums.UserStatus;
 import com.himax.ead.authuser.domain.enums.UserType;
@@ -14,6 +16,9 @@ import com.himax.ead.authuser.domain.services.UserRegistryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +39,8 @@ public class AuthenticationController {
     private RolesService rolesService;
     private UserMapper mapper;
     private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
+    private JwtProvider jwtProvider;
 
     @PostMapping("signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,8 +59,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("login")
-    public UserOutputDto login(@RequestBody LoginDto login) {
-        Users user = service.findbyUserName(login.getUsername());
-        return mapper.toDto(user);
+    public JwtDto login(@RequestBody LoginDto login) {
+        Authentication authentication = authenticationManager.authenticate(login.toAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtProvider.generateJwt(authentication);
+        return new JwtDto(jwt);
     }
 }

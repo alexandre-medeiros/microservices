@@ -110,8 +110,9 @@ public class ErrorHandler {
                     HttpStatus.BAD_REQUEST;
             case "EntityInUseException", "AlreadyExistsException", "DataIntegrityViolationException" ->
                     HttpStatus.CONFLICT;
-            case "UsernameNotFoundException, EntityNotFoundException" -> HttpStatus.NOT_FOUND;
+            case "UsernameNotFoundException", "EntityNotFoundException" -> HttpStatus.NOT_FOUND;
             case "SocketTimeoutException" -> HttpStatus.GATEWAY_TIMEOUT;
+            case "AccessDeniedException" -> HttpStatus.FORBIDDEN;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
     }

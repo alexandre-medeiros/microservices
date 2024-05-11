@@ -1,6 +1,7 @@
 package com.himax.ead.authuser.domain.model;
 
 import com.himax.ead.authuser.api.v1.model.user.UserEventDto;
+import com.himax.ead.authuser.core.config.security.UserDetailsImpl;
 import com.himax.ead.authuser.domain.enums.UserStatus;
 import com.himax.ead.authuser.domain.enums.UserType;
 import com.himax.ead.authuser.domain.exception.BusinessException;
@@ -12,8 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -93,26 +92,16 @@ public class Users implements Serializable {
         return dto;
     }
 
-    public UserDetails toUserDetails() {
-        return User
-                .withUsername(this.username)
-                .password(this.password)
-                .authorities(toAuthorities())
-                .build();
-    }
-
-    public String[] toAuthorities() {
-        return roles.stream()
-                .map(Roles::getAuthority)
-                .toArray(String[]::new);
+    public UserDetailsImpl toUserDetails() {
+        return UserDetailsImpl.build(this);
     }
 
     public void verifyCurrentAndNewPassword(String entered, String newPassword) {
-        passwordEnteredIsTheSameAsRegistered(entered);
+        validPasswordAsRegistered(entered);
         newPasswordIsEqualsAsRegistered(newPassword);
     }
 
-    private void passwordEnteredIsTheSameAsRegistered(String entered) {
+    public void validPasswordAsRegistered(String entered) {
         if (!this.password.equals(entered)) {
             log.warn("Current password entered to user id {} is different of the registered", this.id);
             throw new BusinessException("Current password entered is different of the registered");
@@ -125,5 +114,4 @@ public class Users implements Serializable {
             throw new BusinessException("New password entered is equals as registered");
         }
     }
-
 }

@@ -16,4 +16,11 @@ insert into roles values ('91d720a0-a7db-4736-87a7-e1cd4ddabc2f', 'ROLE_INSTRUCT
 insert into roles values ('d831507e-37db-48f3-aab7-1a53cca2053f', 'ROLE_STUDENT');
 insert into roles values ('9c986ff6-32c8-4457-84da-ce81edcd3736', 'ROLE_USER');
 
-
+INSERT INTO users_roles (users_id, roles_id)
+VALUES
+    ('123e4567-e89b-12d3-a456-426614174001', 'd831507e-37db-48f3-aab7-1a53cca2053f'),
+    ('123e4567-e89b-12d3-a456-426614174002', 'd831507e-37db-48f3-aab7-1a53cca2053f'),
+    ('123e4567-e89b-12d3-a456-426614174003', 'd831507e-37db-48f3-aab7-1a53cca2053f'),
+    ('123e4567-e89b-12d3-a456-426614174004', 'd831507e-37db-48f3-aab7-1a53cca2053f'),
+    ('123e4567-e89b-12d3-a456-426614174005', 'd831507e-37db-48f3-aab7-1a53cca2053f'),
+    ('123e4567-e89b-12d3-a456-426614174006', 'd831507e-37db-48f3-aab7-1a53cca2053f');
