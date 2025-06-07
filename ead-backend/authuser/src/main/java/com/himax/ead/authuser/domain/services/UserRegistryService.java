@@ -7,6 +7,7 @@ import com.himax.ead.authuser.domain.enums.UserType;
 import com.himax.ead.authuser.domain.exception.AlreadyExistsException;
 import com.himax.ead.authuser.domain.exception.EntityInUseException;
 import com.himax.ead.authuser.domain.exception.EntityNotFoundException;
+import com.himax.ead.authuser.domain.model.Roles;
 import com.himax.ead.authuser.domain.model.Users;
 import com.himax.ead.authuser.domain.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,8 @@ import java.util.UUID;
 import static com.himax.ead.authuser.domain.enums.ActionType.CREATE;
 import static com.himax.ead.authuser.domain.enums.ActionType.DELETE;
 import static com.himax.ead.authuser.domain.enums.ActionType.UPDATE;
+import static com.himax.ead.authuser.domain.enums.RoleType.ROLE_INSTRUCTOR;
+import static com.himax.ead.authuser.domain.enums.UserType.INSTRUCTOR;
 
 @Log4j2
 @AllArgsConstructor
@@ -28,6 +31,7 @@ public class UserRegistryService {
 
     private UserRepository repository;
     private UserEventPublisher userEventPublisher;
+    private RolesService rolesService;
 
     public Page<Users> findAllWithFilter(UserFilter filter, Pageable pageable) {
         UserStatus userStatus = filter.getUserStatus();
@@ -89,8 +93,10 @@ public class UserRegistryService {
 
     @Transactional
     public Users saveInstructor(UUID userId) {
+        Roles role = rolesService.findByRoleName(ROLE_INSTRUCTOR);
         Users user = find(userId);
-        user.setUserType(UserType.INSTRUCTOR);
+        user.addRole(role);
+        user.setUserType(INSTRUCTOR);
         return updateAndPublish(user);
     }
 

@@ -1,5 +1,6 @@
 package com.himax.ead.course.domain.model;
 
+import com.himax.ead.course.core.config.security.UserDetailsImpl;
 import com.himax.ead.course.domain.enums.UserStatus;
 import com.himax.ead.course.domain.enums.UserType;
 import lombok.AllArgsConstructor;
@@ -57,5 +58,9 @@ public class Users implements Serializable {
 
     public boolean isActive() {
         return this.getUserStatus().equals(UserStatus.ACTIVE.toString());
+    }
+
+    public boolean isNotTheSame(UserDetailsImpl authUser) {
+        return this.getId().equals(authUser.getId());
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,6 +40,7 @@ public class CourseController {
     private CourseService courseService;
     private CourseMapper mapper;
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping
     public Page<CourseDto> getAllCourses(
             @Valid CourseFilter filter,
@@ -49,22 +50,26 @@ public class CourseController {
         return new PageImpl<>(list, pageable, list.size());
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CourseDto getOneCourse(@PathVariable UUID id) {
         return mapper.toDto(courseService.findById(id));
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping
-    public ResponseEntity<Object> saveCourse(@RequestBody @Valid CourseDto dto, Errors errors) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public CourseDto saveCourse(@RequestBody @Valid CourseDto dto, Errors errors) {
         log.debug("POST saveCourse courseDto received {} ", dto.toString());
         Course course = mapper.toDomain(dto);
         Course saved = courseService.save(course);
         log.debug("POST saveCourse courseId saved {} ", saved.getId());
         log.info("Course saved successfully courseId {} ", saved.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(saved));
+        return mapper.toDto(saved);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCourse(@PathVariable UUID id) {
@@ -74,6 +79,7 @@ public class CourseController {
         log.info("Course deleted successfully courseId {} ", id);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("/{id}")
     public CourseDto updateCourse(@PathVariable UUID id, @RequestBody @Valid CourseDto courseDto) {
         log.debug("PUT updateCourse courseDto received {} ", courseDto.toString());

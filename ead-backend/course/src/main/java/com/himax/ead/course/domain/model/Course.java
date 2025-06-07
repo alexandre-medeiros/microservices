@@ -66,9 +66,4 @@ public class Course implements Serializable {
     public void addUser(Users user) {
         users.add(user);
     }
-
-    public boolean isUserNotValidToCreateCourse(Users user) {
-        return !(user.isActive() &&
-                (user.isInstructor() || user.isAdministrator()));
-    }
 }

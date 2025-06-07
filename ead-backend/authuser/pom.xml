@@ -17,9 +17,11 @@
         <java.version>11</java.version>
         <jwt.version>0.11.5</jwt.version>
         <spring-cloud.version>2020.0.4</spring-cloud.version>
+        <log4j2.version>2.17.0</log4j2.version>
         <dockerfile-maven-version>1.4.13</dockerfile-maven-version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.28</org.projectlombok.version>
+        <ecs-logging-java.version>1.2.0</ecs-logging-java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -70,6 +72,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>co.elastic.logging</groupId>
+            <artifactId>log4j2-ecs-layout</artifactId>
+            <version>${ecs-logging-java.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

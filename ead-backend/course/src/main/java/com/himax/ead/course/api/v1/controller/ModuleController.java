@@ -9,6 +9,7 @@ import com.himax.ead.course.domain.service.ModuleService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,23 +37,25 @@ public class ModuleController {
     @Autowired
     ModuleMapper mapper;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping("/courses/{courseId}/modules")
     @ResponseStatus(HttpStatus.CREATED)
     public ModuleDto saveModule(@PathVariable UUID courseId,
-                                @RequestBody @Valid ModuleDto moduleDto){
+                                @RequestBody @Valid ModuleDto moduleDto) {
         log.debug("POST saveModule moduleDto received {} ", moduleDto.toString());
         Modules module = mapper.toDomain(moduleDto);
         module.setCourse(courseService.findById(courseId));
         Modules moduleModel = moduleService.save(module);
         log.debug("POST saveModule moduleId saved {} ", moduleModel.getId());
         log.info("Module saved successfully moduleId {} ", moduleModel.getId());
-        return mapper.toDto( moduleModel);
+        return mapper.toDto(moduleModel);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("/courses/{courseId}/modules/{moduleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteModule(@PathVariable UUID courseId,
-                             @PathVariable UUID moduleId){
+                             @PathVariable UUID moduleId) {
         log.debug("DELETE deleteModule moduleId received {} ", moduleId);
         courseService.findById(courseId);
         Modules module = moduleService.findById(moduleId);
@@ -61,31 +64,34 @@ public class ModuleController {
         log.info("Module deleted successfully moduleId {} ", moduleId);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("/courses/{courseId}/modules/{moduleId}")
-    public ModuleDto updateModule(@PathVariable(value="courseId") UUID courseId,
-                                  @PathVariable(value="moduleId") UUID moduleId,
-                                  @RequestBody @Valid ModuleDto moduleDto){
+    public ModuleDto updateModule(@PathVariable(value = "courseId") UUID courseId,
+                                  @PathVariable(value = "moduleId") UUID moduleId,
+                                  @RequestBody @Valid ModuleDto moduleDto) {
         log.debug("PUT updateModule moduleDto received {} ", moduleDto.toString());
         courseService.findById(courseId);
         moduleService.findById(moduleId);
         Modules existing = moduleService.findById(moduleId);
         Modules updated = mapper.toDomain(moduleDto);
-        Modules moduleModel =  moduleService.save(mapper.update(updated,existing));
+        Modules moduleModel = moduleService.save(mapper.update(updated, existing));
 
         log.debug("PUT updateModule moduleId saved {} ", moduleModel.getId());
         log.info("Module updated successfully moduleId {} ", moduleModel.getId());
         return mapper.toDto(moduleModel);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/courses/{courseId}/modules")
-    public List<ModuleDto> getAllModules(@PathVariable(value="courseId") UUID courseId){
+    public List<ModuleDto> getAllModules(@PathVariable(value = "courseId") UUID courseId) {
         courseService.findById(courseId);
         return mapper.toDtoList(moduleService.findAllByCourse(courseId));
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/courses/{courseId}/modules/{moduleId}")
-    public ModuleDto getOneModule(@PathVariable(value="courseId") UUID courseId,
-                                  @PathVariable(value="moduleId") UUID moduleId){
+    public ModuleDto getOneModule(@PathVariable(value = "courseId") UUID courseId,
+                                  @PathVariable(value = "moduleId") UUID moduleId) {
         courseService.findById(courseId);
         Modules module = moduleService.findById(moduleId);
         return mapper.toDto(module);

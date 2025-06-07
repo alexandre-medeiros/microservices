@@ -1,4 +1,4 @@
-package com.himax.ead.authuser.domain.model;
+package com.easydiner.domain.model;
 
 import com.himax.ead.authuser.api.v1.model.user.UserEventDto;
 import com.himax.ead.authuser.core.config.security.UserDetailsImpl;
@@ -13,23 +13,14 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.BeanUtils;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
 @Data
 @Log4j2
 @AllArgsConstructor

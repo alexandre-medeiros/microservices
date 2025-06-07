@@ -15,6 +15,7 @@
     <description>Himax notification EAD service</description>
     <properties>
         <java.version>11</java.version>
+        <jwt.version>0.11.5</jwt.version>
         <spring-cloud.version>2020.0.4</spring-cloud.version>
         <dockerfile-maven-version>1.4.13</dockerfile-maven-version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
@@ -31,6 +32,26 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>

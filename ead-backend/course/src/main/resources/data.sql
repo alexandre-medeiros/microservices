@@ -86,7 +86,7 @@ values ('f60a230e-7833-41d0-85e9-b4aa78a6b778', '2023-03-03 12:00:00', 'Indexing
 
 insert into USERS (id, cpf, email, full_name, image_url, user_status, user_type)
 values
-    ('123e4567-e89b-12d3-a456-426614174001', '12345678901', 'user1@example.com', 'User One', null, 'ACTIVE', 'STUDENT'),
+    ('123e4567-e89b-12d3-a456-426614174001', '12345678901', 'user1@example.com', 'User One', null, 'ACTIVE', 'ADMIN'),
     ('123e4567-e89b-12d3-a456-426614174002', '23456789012', 'user2@example.com', 'User Two', NULL, 'ACTIVE', 'STUDENT'),
     ('123e4567-e89b-12d3-a456-426614174003', '34567890123', 'user3@example.com', 'User Three',NULL,'BLOCKED', 'STUDENT'),
     ('123e4567-e89b-12d3-a456-426614174004', '45678901234', 'user4@example.com', 'User Four', NULL,'ACTIVE', 'STUDENT'),

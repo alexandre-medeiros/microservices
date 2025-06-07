@@ -49,6 +49,45 @@ services:
     networks:
       - ead-network
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.13.4
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./logs:/usr/share/filebeat/logs:ro
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - registry:/usr/share/filebeat/data:rw
+    command: >
+      filebeat -e --strict.perms=false
+      -E output.elasticsearch.hosts=["localhost:9200"]
+    networks:
+      - elastic
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: es01
+    ports:
+      - "9200:9200"
+    deploy:
+      resources:
+        limits:
+          memory: 1GB
+    environment:
+      - discovery.type=single-node
+
+  kib01:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: kib01
+    ports:
+      - "5601:5601"
+
+volumes:
+  registry:
+
 networks:
   ead-network:
+    driver: bridge
+  elastic:
     driver: bridge
